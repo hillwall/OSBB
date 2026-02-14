@@ -183,7 +183,7 @@
                         <div class="flex justify-between items-center">
                             <span class="text-[10px] text-slate-600">Переплата:</span>
                             <span class="text-sm font-bold" 
-                                  :class="user.osbbOverpayment === '—' ? 'text-slate-600' : 'text-green-600'"
+                                  :class="user.osbbOverpayment === '—' ? 'text-slate-600' : 'text-slate-400'"
                                   x-text="user.osbbOverpayment === '—' ? '—' : user.osbbOverpayment + ' грн'"></span>
                         </div>
                         <div class="flex justify-between items-center">
@@ -200,7 +200,7 @@
                         <div class="flex justify-between items-center">
                             <span class="text-[10px] text-slate-600">Переплата:</span>
                             <span class="text-sm font-bold" 
-                                  :class="user.waterOverpayment === '—' ? 'text-slate-600' : 'text-green-600'"
+                                  :class="user.waterOverpayment === '—' ? 'text-slate-600' : 'text-green-400'" 
                                   x-text="user.waterOverpayment === '—' ? '—' : user.waterOverpayment + ' грн'"></span>
                         </div>
                         <div class="flex justify-between items-center">
@@ -211,6 +211,39 @@
                         </div>
                     </div>
                 </div>
+           </div>
+
+            <!-- Бюджет будинку -->
+            <div class="glass-card rounded-2xl p-4 mb-3">
+                <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <i class="ph-fill ph-wallet text-green-600"></i>
+                    Бюджет та реквізити
+                </h3>
+                
+                <div class="space-y-3">
+                    <!-- Бюджет -->
+                    <div class="bg-white/50 rounded-xl p-3">
+                        <p class="text-xs text-slate-500 mb-1">💵 Бюджет будинку складає:</p>
+                        <p class="text-lg font-bold text-green-600">52,483 грн</p>
+                    </div>
+
+                    <!-- Реквізити -->
+                    <div class="bg-white/50 rounded-xl p-3">
+                        <p class="text-xs text-slate-500 mb-2">Реквізити для сплати:</p>
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between bg-white rounded-lg p-2">
+                                <span class="text-sm font-mono font-bold text-slate-800">4441 1110 5218 2718</span>
+                                <button onclick="navigator.clipboard.writeText('4441111052182718')" class="text-blue-600 hover:text-blue-700">
+                                    <i class="ph ph-copy text-lg"></i>
+                                </button>
+                            </div>
+                            <div class="text-center text-xs text-slate-500">або</div>
+                            <a href="https://send.monobank.ua/3PopUQvnkm" target="_blank" class="block bg-black text-white rounded-lg p-2 text-center text-sm font-semibold hover:bg-gray-800 transition-colors">
+                                💳 Monobank
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Остання інформація -->
@@ -218,6 +251,15 @@
                 <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
                     <i class="ph-fill ph-info text-blue-600"></i>
                     Остання активність
+                    <!-- Кнопка відправки повідомлення адміністратору -->
+                    <button @click="sendMessageToAdmin" class="glass-card rounded-2xl p-3 flex items-center justify-center gap-2 text-blue-600 hover:bg-white/40 transition-colors font-semibold">
+                        <i class="ph-fill ph-chat-text text-xl"></i>
+                        <span>Відправити повідомлення</span>
+                    </button>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-600">Вартість останньої різниці:</span>
+                        <span class="text-sm font-bold text-slate-800" x-text="user.lastDifferenceCost || '—'"></span>
+                    </div>
                 </h3>
                 
                 <div class="space-y-2">
@@ -363,9 +405,11 @@
                     }
                 },
 
-                // ========== ЗАВАНТАЖЕННЯ ДАНИХ КОРИСТУВАЧА ==========
+               // ========== ЗАВАНТАЖЕННЯ ДАНИХ КОРИСТУВАЧА ==========
                 async loadUserData() {
                     if (!this.user.flat) return;
+                    
+                    this.loading = true; // Показуємо індикатор завантаження
 
                     try {
                         const params = new URLSearchParams({
@@ -381,6 +425,12 @@
                         }
                     } catch (error) {
                         console.error('Load user data error:', error);
+                    }
+                        } catch (error) {
+                          console.error('Load user data error:', error);
+                        } finally {
+                          this.loading = false; // Ховаємо індикатор завантаження
+                        }
                     }
                 },
 
@@ -488,7 +538,35 @@
                         this.loading = false;
                     }
                 },
+// ========== ВІДПРАВКА ПОВІДОМЛЕННЯ АДМІНІСТРАТОРУ ==========
+async sendMessageToAdmin() {
+    const message = prompt("Введіть ваше повідомлення для адміністратора:");
+    if (!message || message.trim() === '') return;
+    
+    this.loading = true;
+    
+    try {
+        const params = new URLSearchParams({
+            action: 'sendAdminMessage',
+            flat: this.user.flat,
+            message: message
+        });
 
+        const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?${params}`);
+        const data = await response.json();
+
+        if (data.success) {
+            this.showNotification('Повідомлення надіслано адміністратору! ✅', 'success');
+        } else {
+            this.showNotification(data.error || 'Помилка', 'error');
+        }
+    } catch (error) {
+        console.error('Send admin message error:', error);
+        this.showNotification('Помилка з\'єднання', 'error');
+    } finally {
+        this.loading = false;
+    }
+},
                 // ========== ПОКАЗ СПОВІЩЕННЯ ==========
                 showNotification(message, type = 'info') {
                     if (this.tg) {
