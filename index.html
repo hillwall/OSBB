@@ -282,7 +282,7 @@
    </main>
 
     <!-- Футер з кнопкою "Вихід" (показується на всіх екранах крім login) -->
-    <footer x-show="page !== 'login'"
+    <footer x-show="page !== 'login'" class="w-full max-w-sm mt-4 pb-4">
         <button @click="logout" class="w-full glass-card rounded-2xl p-3 flex items-center justify-center gap-2 text-red-600 hover:bg-red-50 transition-colors font-semibold">
             <i class="ph-fill ph-sign-out text-xl"></i>
             <span>Вихід</span>
