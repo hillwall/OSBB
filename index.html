@@ -199,7 +199,7 @@
                     <div class="space-y-3">
                         <div class="bg-white/50 rounded-xl p-3">
                             <p class="text-xs text-slate-500 mb-1">💵 Бюджет будинку складає:</p>
-                            <p class="text-lg font-bold text-green-600">52,483 грн</p>
+                            <p class="text-lg font-bold text-green-600" x-text="user.houseBudget === '—' ? '—' : user.houseBudget + ' грн'"></p>
                         </div>
 
                         <div class="bg-white/50 rounded-xl p-3">
@@ -276,7 +276,8 @@
                     osbbDebt: '—',
                     lastCounter: '—',
                     lastPaymentDate: '—',
-                    lastDifferenceCost: '—'
+                    lastDifferenceCost: '—',
+                    houseBudget: '—'
                 },
 
                 input: {
@@ -557,7 +558,8 @@
                         osbbDebt: '—',
                         lastCounter: '—',
                         lastPaymentDate: '—',
-                        lastDifferenceCost: '—'
+                        lastDifferenceCost: '—',
+                        houseBudget: '—'
                     };
                     this.input = {
                         flat: '',
