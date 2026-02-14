@@ -187,10 +187,10 @@
                                   x-text="user.osbbOverpayment === '—' ? '—' : user.osbbOverpayment + ' грн'"></span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-600">Борг:</span>
+                            <span class="text-[10px] text-slate-600">Переплата:</span>
                             <span class="text-sm font-bold" 
-                                  :class="user.osbbDebt === '—' ? 'text-slate-600' : 'text-red-600'"
-                                  x-text="user.osbbDebt === '—' ? '—' : user.osbbDebt + ' грн'"></span>
+                                  :class="user.osbbOverpayment === '—' ? 'text-slate-600' : 'text-slate-400'"
+                                  x-text="user.osbbOverpayment === '—' ? '—' : user.osbbOverpayment + ' грн'"></span>
                         </div>
                     </div>
 
@@ -200,7 +200,7 @@
                         <div class="flex justify-between items-center">
                             <span class="text-[10px] text-slate-600">Переплата:</span>
                             <span class="text-sm font-bold" 
-                                  :class="user.waterOverpayment === '—' ? 'text-slate-600' : 'text-green-400'" 
+                                  :class="user.waterOverpayment === '—' ? 'text-slate-600' : 'text-slate-400'"
                                   x-text="user.waterOverpayment === '—' ? '—' : user.waterOverpayment + ' грн'"></span>
                         </div>
                         <div class="flex justify-between items-center">
@@ -251,6 +251,10 @@
                 <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
                     <i class="ph-fill ph-info text-blue-600"></i>
                     Остання активність
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-600">Вартість останньої різниці:</span>
+                        <span class="text-sm font-bold text-slate-800" x-text="user.lastDifferenceCost === '—' ? '—' : user.lastDifferenceCost + ' грн'"></span>
+                    </div>
                     <!-- Кнопка відправки повідомлення адміністратору -->
                     <button @click="sendMessageToAdmin" class="glass-card rounded-2xl p-3 flex items-center justify-center gap-2 text-blue-600 hover:bg-white/40 transition-colors font-semibold">
                         <i class="ph-fill ph-chat-text text-xl"></i>
@@ -299,14 +303,14 @@
                 // ========== ДАНІ КОРИСТУВАЧА ==========
                 user: {
                     flat: null,
-                    waterOverpayment: '0.00',
-                    waterDebt: '0.00',
-                    osbbOverpayment: '0.00',
-                    osbbDebt: '0.00',
+                    waterOverpayment: '—',
+                    waterDebt: '—',
+                    osbbOverpayment: '—',
+                    osbbDebt: '—',
                     lastCounter: '—',
                     lastPaymentDate: '—',
-                    lastDifferenceCost: '—'
-                },
+                    lastDifferenceCost: '—'  // ДОДАТИ
+                }
 
                 // ========== ПОЛЯ ВВОДУ ==========
                 input: {
@@ -351,21 +355,15 @@ checkSavedAuth() {
         const savedPassword = localStorage.getItem('osbb_password');
         
         if (savedFlat && savedPassword) {
-            // Автоматично входимо
             this.input.flat = savedFlat;
             this.input.password = savedPassword;
-            
-            // Затримка перед входом, щоб сторінка встигла завантажитись
-            setTimeout(() => {
-                this.login();
-            }, 100);
+            this.login();
         }
     } catch (error) {
         console.error('Error checking saved auth:', error);
-        // Якщо помилка - показуємо екран авторизації
         this.page = 'login';
     }
-}
+},  // ← ДОДАТИ ЦЮ ДУЖКУ ТА КОМУ
                 // ========== АВТОРИЗАЦІЯ ==========
 async login() {
     if (!this.input.flat || !this.input.password) {
