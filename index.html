@@ -345,67 +345,90 @@
                 },
 
                 // ========== ПЕРЕВІРКА ЗБЕРЕЖЕНОЇ АВТОРИЗАЦІЇ ==========
-                checkSavedAuth() {
-                    try {
-                        const savedFlat = localStorage.getItem('osbb_flat');
-                        const savedPassword = localStorage.getItem('osbb_password');
-                        
-                        if (savedFlat && savedPassword) {
-                            // Автоматично входимо
-                            this.input.flat = savedFlat;
-                            this.input.password = savedPassword;
-                            this.login();
-                        }
-                    } catch (error) {
-                        console.error('Error checking saved auth:', error);
-                    }
-                },
-
+checkSavedAuth() {
+    try {
+        const savedFlat = localStorage.getItem('osbb_flat');
+        const savedPassword = localStorage.getItem('osbb_password');
+        
+        if (savedFlat && savedPassword) {
+            // Автоматично входимо
+            this.input.flat = savedFlat;
+            this.input.password = savedPassword;
+            
+            // Затримка перед входом, щоб сторінка встигла завантажитись
+            setTimeout(() => {
+                this.login();
+            }, 100);
+        }
+    } catch (error) {
+        console.error('Error checking saved auth:', error);
+        // Якщо помилка - показуємо екран авторизації
+        this.page = 'login';
+    }
+}
                 // ========== АВТОРИЗАЦІЯ ==========
-                async login() {
-                    if (!this.input.flat || !this.input.password) {
-                        this.errorMsg = 'Заповніть всі поля';
-                        return;
-                    }
+async login() {
+    if (!this.input.flat || !this.input.password) {
+        this.errorMsg = 'Заповніть всі поля';
+        this.page = 'login'; // Показуємо екран логіну
+        return;
+    }
 
-                    this.loading = true;
-                    this.errorMsg = '';
+    this.loading = true;
+    this.errorMsg = '';
 
-                    try {
-                        const params = new URLSearchParams({
-                            action: 'auth',
-                            flat: this.input.flat,
-                            password: this.input.password,
-                            telegram_id: this.telegramId || ''
-                        });
+    try {
+        const params = new URLSearchParams({
+            action: 'auth',
+            flat: this.input.flat,
+            password: this.input.password,
+            telegram_id: this.telegramId || ''
+        });
 
-                        const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?${params}`);
-                        const data = await response.json();
+        const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?${params}`);
+        const data = await response.json();
 
-                        if (data.success) {
-                            this.user.flat = data.flat;
-                            
-                            // Зберігаємо дані авторизації в localStorage
-                            try {
-                                localStorage.setItem('osbb_flat', this.input.flat);
-                                localStorage.setItem('osbb_password', this.input.password);
-                            } catch (e) {
-                                console.error('Error saving to localStorage:', e);
-                            }
-                            
-                            this.page = 'dashboard';
-                            await this.loadUserData();
-                        } else {
-                            this.errorMsg = data.error || 'Помилка авторизації';
-                        }
-                    } catch (error) {
-                        console.error('Login error:', error);
-                        this.errorMsg = 'Помилка з\'єднання';
-                    } finally {
-                        this.loading = false;
-                    }
-                },
-
+        if (data.success) {
+            this.user.flat = data.flat;
+            
+            // Зберігаємо дані авторизації в localStorage
+            try {
+                localStorage.setItem('osbb_flat', this.input.flat);
+                localStorage.setItem('osbb_password', this.input.password);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+            
+            this.page = 'dashboard';
+            await this.loadUserData();
+        } else {
+            this.errorMsg = data.error || 'Помилка авторизації';
+            this.page = 'login'; // Показуємо екран логіну при помилці
+            
+            // Очищаємо збережені дані при помилці
+            try {
+                localStorage.removeItem('osbb_flat');
+                localStorage.removeItem('osbb_password');
+            } catch (e) {
+                console.error('Error clearing localStorage:', e);
+            }
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        this.errorMsg = 'Помилка з\'єднання';
+        this.page = 'login'; // Показуємо екран логіну при помилці
+        
+        // Очищаємо збережені дані при помилці
+        try {
+            localStorage.removeItem('osbb_flat');
+            localStorage.removeItem('osbb_password');
+        } catch (e) {
+            console.error('Error clearing localStorage:', e);
+        }
+    } finally {
+        this.loading = false;
+    }
+}
                // ========== ЗАВАНТАЖЕННЯ ДАНИХ КОРИСТУВАЧА ==========
                 async loadUserData() {
                     if (!this.user.flat) return;
