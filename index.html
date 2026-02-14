@@ -187,10 +187,10 @@
                                   x-text="user.osbbOverpayment === '—' ? '—' : user.osbbOverpayment + ' грн'"></span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-600">Переплата:</span>
+                            <span class="text-[10px] text-slate-600">Борг:</span>
                             <span class="text-sm font-bold" 
-                                  :class="user.osbbOverpayment === '—' ? 'text-slate-600' : 'text-slate-400'"
-                                  x-text="user.osbbOverpayment === '—' ? '—' : user.osbbOverpayment + ' грн'"></span>
+                                  :class="user.osbbDebt === '—' ? 'text-slate-600' : 'text-red-600'"
+                                  x-text="user.osbbDebt === '—' ? '—' : user.osbbDebt + ' грн'"></span>
                         </div>
                     </div>
 
@@ -200,7 +200,7 @@
                         <div class="flex justify-between items-center">
                             <span class="text-[10px] text-slate-600">Переплата:</span>
                             <span class="text-sm font-bold" 
-                                  :class="user.waterOverpayment === '—' ? 'text-slate-600' : 'text-slate-400'"
+                                  :class="user.waterOverpayment === '—' ? 'text-slate-600' : 'text-green-400'" 
                                   x-text="user.waterOverpayment === '—' ? '—' : user.waterOverpayment + ' грн'"></span>
                         </div>
                         <div class="flex justify-between items-center">
@@ -251,10 +251,6 @@
                 <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
                     <i class="ph-fill ph-info text-blue-600"></i>
                     Остання активність
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-600">Вартість останньої різниці:</span>
-                        <span class="text-sm font-bold text-slate-800" x-text="user.lastDifferenceCost === '—' ? '—' : user.lastDifferenceCost + ' грн'"></span>
-                    </div>
                     <!-- Кнопка відправки повідомлення адміністратору -->
                     <button @click="sendMessageToAdmin" class="glass-card rounded-2xl p-3 flex items-center justify-center gap-2 text-blue-600 hover:bg-white/40 transition-colors font-semibold">
                         <i class="ph-fill ph-chat-text text-xl"></i>
@@ -282,7 +278,7 @@
    </main>
 
     <!-- Футер з кнопкою "Вихід" (показується на всіх екранах крім login) -->
-    <footer x-show="page !== 'login'" class="w-full max-w-sm mt-4 pb-4">
+    <footer x-show="page !== 'login'" class="w-full max-w-sm mt-4 pb-4" style="display: none;">
         <button @click="logout" class="w-full glass-card rounded-2xl p-3 flex items-center justify-center gap-2 text-red-600 hover:bg-red-50 transition-colors font-semibold">
             <i class="ph-fill ph-sign-out text-xl"></i>
             <span>Вихід</span>
@@ -303,14 +299,14 @@
                 // ========== ДАНІ КОРИСТУВАЧА ==========
                 user: {
                     flat: null,
-                    waterOverpayment: '—',
-                    waterDebt: '—',
-                    osbbOverpayment: '—',
-                    osbbDebt: '—',
+                    waterOverpayment: '0.00',
+                    waterDebt: '0.00',
+                    osbbOverpayment: '0.00',
+                    osbbDebt: '0.00',
                     lastCounter: '—',
                     lastPaymentDate: '—',
-                    lastDifferenceCost: '—'  // ДОДАТИ
-                }
+                    lastDifferenceCost: '—'
+                },
 
                 // ========== ПОЛЯ ВВОДУ ==========
                 input: {
@@ -349,23 +345,24 @@
                 },
 
                 // ========== ПЕРЕВІРКА ЗБЕРЕЖЕНОЇ АВТОРИЗАЦІЇ ==========
-checkSavedAuth() {
-    try {
-        const savedFlat = localStorage.getItem('osbb_flat');
-        const savedPassword = localStorage.getItem('osbb_password');
-        
-        if (savedFlat && savedPassword) {
-            this.input.flat = savedFlat;
-            this.input.password = savedPassword;
-            this.login();
-        }
-    } catch (error) {
-        console.error('Error checking saved auth:', error);
-        this.page = 'login';
-    }
-},  // ← ДОДАТИ ЦЮ ДУЖКУ ТА КОМУ
+                checkSavedAuth() {
+                    try {
+                        const savedFlat = localStorage.getItem('osbb_flat');
+                        const savedPassword = localStorage.getItem('osbb_password');
+                        
+                        if (savedFlat && savedPassword) {
+                            this.input.flat = savedFlat;
+                            this.input.password = savedPassword;
+                            this.login();
+                        }
+                    } catch (error) {
+                        console.error('Error checking saved auth:', error);
+                        this.page = 'login';
+                    }
+                },
+
                 // ========== АВТОРИЗАЦІЯ ==========
-async login() {
+                async login() {
     if (!this.input.flat || !this.input.password) {
         this.errorMsg = 'Заповніть всі поля';
         this.page = 'login'; // Показуємо екран логіну
