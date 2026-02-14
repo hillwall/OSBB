@@ -2,46 +2,32 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ОСББ Данили Галицького</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(180deg, #b0e0ff 0%, #e0f7fa 100%);
-            color: #1e293b;
-        }
         .glass-card {
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.05);
-        }
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         .btn-primary {
             background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
             box-shadow: 0 2px 10px rgba(79, 172, 254, 0.3);
-            transition: all 0.2s ease-in-out;
         }
-        .btn-primary:active { transform: scale(0.98); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior: none;
+        }
     </style>
 </head>
-
 <body x-data="osbbApp()" class="flex flex-col items-center p-4 h-full w-full">
 
     <header class="w-full max-w-sm text-center mb-4 shrink-0 z-50 relative">
@@ -55,229 +41,217 @@
         </template>
     </header>
 
-    <!-- Індикатор завантаження -->
-    <div x-show="loading" class="fixed inset-0 bg-black/20 z-[60] flex items-center justify-center backdrop-blur-sm" style="display: none;">
-        <div class="w-12 h-12 border-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
-    </div>
+    <main class="w-full max-w-sm flex-1 overflow-hidden relative">
+        
+        <div x-show="loading" class="fixed inset-0 bg-black/20 z-[60] flex items-center justify-center backdrop-blur-sm">
+            <div class="bg-white rounded-2xl p-6 shadow-2xl">
+                <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p class="mt-3 text-slate-600 text-sm font-medium">Завантаження...</p>
+            </div>
+        </div>
 
-    <main class="w-full max-w-sm flex-grow relative grid grid-cols-1 grid-rows-1 overflow-hidden">
-
-        <!-- ========== ЕКРАН АВТОРИЗАЦІЇ ========== -->
-        <div x-show="page === 'login'" x-transition.opacity.duration.300ms class="col-start-1 row-start-1 w-full flex flex-col justify-center z-20">
-            <div class="glass-card rounded-2xl p-6 text-center w-full shadow-lg">
-                <h2 class="text-lg font-semibold mb-4 text-slate-700">Авторизація</h2>
-                
-                <div class="space-y-3">
-                    <div class="text-left">
-                        <input type="number" x-model="input.flat" placeholder="№ Квартири" 
-                               class="w-full bg-white/80 border-0 rounded-xl p-3 text-center font-semibold text-slate-800 shadow-inner focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400">
-                    </div>
+        <div class="grid grid-cols-1 grid-rows-1 h-full">
+            
+            <div x-show="page === 'login'" x-transition.opacity.duration.300ms 
+                 class="col-start-1 row-start-1 w-full flex flex-col justify-center z-20">
+                <div class="glass-card rounded-3xl p-6 shadow-2xl">
+                    <h2 class="text-lg font-bold text-slate-700 mb-4 text-center">Вхід</h2>
                     
-                    <div class="text-left">
-                        <input type="password" x-model="input.password" placeholder="Пароль" 
-                               class="w-full bg-white/80 border-0 rounded-xl p-3 text-center font-semibold text-slate-800 shadow-inner focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400">
-                    </div>
-
-                    <button @click="login" class="btn-primary w-full py-3 rounded-xl text-white font-bold text-md uppercase tracking-wider mt-2 shadow-lg">
+                    <input type="number" x-model="input.flat" placeholder="Номер квартири (1-18)" 
+                           class="w-full bg-white/80 border-0 rounded-xl p-3 text-center font-semibold text-slate-800 shadow-inner focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400 mb-3">
+                    
+                    <input type="password" x-model="input.password" placeholder="Пароль" @keyup.enter="login"
+                           class="w-full bg-white/80 border-0 rounded-xl p-3 text-center font-semibold text-slate-800 shadow-inner focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400 mb-3">
+                    
+                    <p x-show="errorMsg" x-text="errorMsg" class="text-red-500 text-xs font-medium mt-1"></p>
+                    
+                    <button @click="login" class="btn-primary w-full py-3 rounded-xl text-white font-bold text-sm uppercase tracking-wider shadow-lg mt-3">
                         Вхід
                     </button>
-                    
-                    <p x-show="errorMsg" x-text="errorMsg" class="text-red-500 text-xs font-medium mt-1" style="display: none;"></p>
                 </div>
             </div>
-        </div>
 
-        <!-- ========== ГОЛОВНИЙ ЕКРАН (DASHBOARD) ========== -->
-        <div x-show="page === 'dashboard'" x-transition.opacity.duration.300ms class="col-start-1 row-start-1 w-full flex flex-col h-full overflow-y-auto no-scrollbar pb-20 z-10" style="display: none;">
-            
-            <!-- Картка подання показника води -->
-            <div class="glass-card rounded-2xl p-3 mb-3 flex flex-col gap-2 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl shadow-sm">
-                        <i class="ph-fill ph-drop"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-slate-600">Показник води</p>
-                        <p class="text-[10px] text-slate-400">Попередній: <span x-text="user.lastCounter" class="font-bold text-slate-700"></span></p>
-                    </div>
-                </div>
-                <input type="number" x-model="input.counter" placeholder="Поточний показник" 
-                       class="w-full bg-white/90 border-0 rounded-xl p-2.5 text-center font-semibold text-slate-800 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400 text-sm">
-                <button @click="submitCounter" class="btn-primary w-full py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wider">
-                    Відправити
-                </button>
-            </div>
-
-            <!-- Картка сплати ОСББ -->
-            <div class="glass-card rounded-2xl p-3 mb-3 flex flex-col gap-2 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 text-xl shadow-sm">
-                        <i class="ph-fill ph-currency-circle-dollar"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-slate-600">Сплата за ОСББ</p>
-                    </div>
-                </div>
-                <input type="number" x-model="input.osbbAmount" placeholder="Сума (грн)" 
-                       class="w-full bg-white/90 border-0 rounded-xl p-2.5 text-center font-semibold text-slate-800 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400 text-sm">
-                <button @click="submitOsbbPayment" class="btn-primary w-full py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wider shadow-lg">
-                    Відправити
-                </button>
-            </div>
-
-            <!-- Картка сплати води -->
-            <div class="glass-card rounded-2xl p-3 mb-3 flex flex-col gap-2 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-cyan-100 rounded-xl flex items-center justify-center text-cyan-600 text-xl shadow-sm">
-                        <i class="ph-fill ph-currency-circle-dollar"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-slate-600">Сплата за воду</p>
-                    </div>
-                </div>
-                <input type="number" x-model="input.waterAmount" placeholder="Сума (грн)" 
-                       class="w-full bg-white/90 border-0 rounded-xl p-2.5 text-center font-semibold text-slate-800 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400 text-sm">
-                <button @click="submitWaterPayment" class="btn-primary w-full py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wider shadow-lg">
-                    Відправити
-                </button>
-            </div>
-
-            <!-- Кнопка переходу до статистики -->
-            <button @click="page = 'stats'" class="glass-card rounded-2xl p-3 flex items-center justify-between hover:bg-white/40 transition-colors">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 text-xl shadow-sm">
-                        <i class="ph-fill ph-chart-bar"></i>
-                    </div>
-                    <p class="text-sm font-semibold text-slate-700">Статистика та борги</p>
-                </div>
-                <i class="ph ph-caret-right text-slate-400"></i>
-            </button>
-        </div>
-
-        <!-- ========== ЕКРАН СТАТИСТИКИ ========== -->
-        <div x-show="page === 'stats'" x-transition.opacity.duration.300ms class="col-start-1 row-start-1 w-full flex flex-col h-full overflow-y-auto no-scrollbar pb-20 z-10" style="display: none;">
-            
-            <div class="mb-3 flex items-center justify-between gap-2">
-                <button @click="page = 'dashboard'" class="glass-card rounded-xl p-2 flex items-center gap-2 text-slate-600 hover:bg-white/40 transition-colors">
-                    <i class="ph ph-caret-left"></i>
-                    <span class="text-sm font-medium">Назад</span>
-                </button>
+            <div x-show="page === 'dashboard'" x-transition.opacity.duration.300ms 
+                 class="col-start-1 row-start-1 w-full flex flex-col h-full overflow-y-auto no-scrollbar pb-20 z-10">
                 
-                <button @click="loadUserData" class="glass-card rounded-xl p-2 flex items-center gap-2 text-blue-600 hover:bg-white/40 transition-colors">
-                    <i class="ph ph-arrow-clockwise text-lg"></i>
-                    <span class="text-sm font-medium">Оновити</span>
-                </button>
-            </div>
-
-            <!-- Статистика боргів -->
-            <div class="glass-card rounded-2xl p-4 mb-3">
-                <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
-                    <i class="ph-fill ph-chart-pie text-purple-600"></i>
-                    Фінансовий статус
-                </h3>
-                
-                <div class="space-y-2">
-                    <!-- ОСББ -->
-                    <div class="bg-white/50 rounded-xl p-3">
-                        <p class="text-xs text-slate-500 mb-1">ОСББ</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-600">Переплата:</span>
-                            <span class="text-sm font-bold" 
-                                  :class="user.osbbOverpayment === '—' ? 'text-slate-600' : 'text-slate-400'"
-                                  x-text="user.osbbOverpayment === '—' ? '—' : user.osbbOverpayment + ' грн'"></span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-600">Борг:</span>
-                            <span class="text-sm font-bold" 
-                                  :class="user.osbbDebt === '—' ? 'text-slate-600' : 'text-red-600'"
-                                  x-text="user.osbbDebt === '—' ? '—' : user.osbbDebt + ' грн'"></span>
-                        </div>
+                <div class="glass-card rounded-2xl p-3 mb-3 flex items-center justify-between shrink-0">
+                    <div>
+                        <p class="text-[10px] text-slate-500">Попередній показник</p>
+                        <span class="font-bold text-slate-700" x-text="user.lastCounter"></span>
                     </div>
-
-                    <!-- Вода -->
-                    <div class="bg-white/50 rounded-xl p-3">
-                        <p class="text-xs text-slate-500 mb-1">Вода</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-600">Переплата:</span>
-                            <span class="text-sm font-bold" 
-                                  :class="user.waterOverpayment === '—' ? 'text-slate-600' : 'text-green-400'" 
-                                  x-text="user.waterOverpayment === '—' ? '—' : user.waterOverpayment + ' грн'"></span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-600">Борг:</span>
-                            <span class="text-sm font-bold" 
-                                  :class="user.waterDebt === '—' ? 'text-slate-600' : 'text-red-600'"
-                                  x-text="user.waterDebt === '—' ? '—' : user.waterDebt + ' грн'"></span>
-                        </div>
-                    </div>
-                </div>
-           </div>
-
-            <!-- Бюджет будинку -->
-            <div class="glass-card rounded-2xl p-4 mb-3">
-                <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
-                    <i class="ph-fill ph-wallet text-green-600"></i>
-                    Бюджет та реквізити
-                </h3>
-                
-                <div class="space-y-3">
-                    <!-- Бюджет -->
-                    <div class="bg-white/50 rounded-xl p-3">
-                        <p class="text-xs text-slate-500 mb-1">💵 Бюджет будинку складає:</p>
-                        <p class="text-lg font-bold text-green-600">52,483 грн</p>
-                    </div>
-
-                    <!-- Реквізити -->
-                    <div class="bg-white/50 rounded-xl p-3">
-                        <p class="text-xs text-slate-500 mb-2">Реквізити для сплати:</p>
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between bg-white rounded-lg p-2">
-                                <span class="text-sm font-mono font-bold text-slate-800">4441 1110 5218 2718</span>
-                                <button onclick="navigator.clipboard.writeText('4441111052182718')" class="text-blue-600 hover:text-blue-700">
-                                    <i class="ph ph-copy text-lg"></i>
-                                </button>
-                            </div>
-                            <div class="text-center text-xs text-slate-500">або</div>
-                            <a href="https://send.monobank.ua/3PopUQvnkm" target="_blank" class="block bg-black text-white rounded-lg p-2 text-center text-sm font-semibold hover:bg-gray-800 transition-colors">
-                                💳 Monobank
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Остання інформація -->
-            <div class="glass-card rounded-2xl p-4">
-                <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
-                    <i class="ph-fill ph-info text-blue-600"></i>
-                    Остання активність
-                    <!-- Кнопка відправки повідомлення адміністратору -->
-                    <button @click="sendMessageToAdmin" class="glass-card rounded-2xl p-3 flex items-center justify-center gap-2 text-blue-600 hover:bg-white/40 transition-colors font-semibold">
-                        <i class="ph-fill ph-chat-text text-xl"></i>
-                        <span>Відправити повідомлення</span>
+                    <button @click="page = 'stats'" class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+                        Статистика та борги
                     </button>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-600">Вартість останньої різниці:</span>
-                        <span class="text-sm font-bold text-slate-800" x-text="user.lastDifferenceCost || '—'"></span>
+                </div>
+
+                <div class="glass-card rounded-2xl p-3 mb-3 flex flex-col gap-2 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl shadow-sm">
+                            <i class="ph-fill ph-drop"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-600">Показник лічильника води</p>
+                        </div>
                     </div>
-                </h3>
+                    <input type="number" x-model="input.counter" placeholder="Введіть показник" 
+                           class="w-full bg-white/90 border-0 rounded-xl p-2.5 text-center font-semibold text-slate-800 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400 text-sm">
+                    <button @click="submitCounter" class="btn-primary w-full py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wider shadow-lg">
+                        Відправити
+                    </button>
+                </div>
+
+                <div class="glass-card rounded-2xl p-3 mb-3 flex flex-col gap-2 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 text-xl shadow-sm">
+                            <i class="ph-fill ph-currency-circle-dollar"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-600">Сплата за ОСББ</p>
+                        </div>
+                    </div>
+                    <input type="number" x-model="input.osbbAmount" placeholder="Сума (грн)" 
+                           class="w-full bg-white/90 border-0 rounded-xl p-2.5 text-center font-semibold text-slate-800 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400 text-sm">
+                    <button @click="submitOsbbPayment" class="btn-primary w-full py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wider shadow-lg">
+                        Відправити
+                    </button>
+                </div>
+
+                <div class="glass-card rounded-2xl p-3 mb-3 flex flex-col gap-2 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-cyan-100 rounded-xl flex items-center justify-center text-cyan-600 text-xl shadow-sm">
+                            <i class="ph-fill ph-currency-circle-dollar"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-600">Сплата за воду</p>
+                        </div>
+                    </div>
+                    <input type="number" x-model="input.waterAmount" placeholder="Сума (грн)" 
+                           class="w-full bg-white/90 border-0 rounded-xl p-2.5 text-center font-semibold text-slate-800 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none placeholder-slate-400 text-sm">
+                    <button @click="submitWaterPayment" class="btn-primary w-full py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wider shadow-lg">
+                        Відправити
+                    </button>
+                </div>
+
+            </div>
+
+            <div x-show="page === 'stats'" x-transition.opacity.duration.300ms 
+                 class="col-start-1 row-start-1 w-full flex flex-col h-full overflow-y-auto no-scrollbar pb-20 z-10">
                 
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-600">Останній показник:</span>
-                        <span class="text-sm font-bold text-slate-800" x-text="user.lastCounter"></span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-600">Останній платіж:</span>
-                        <span class="text-sm font-bold text-slate-800" x-text="user.lastPaymentDate"></span>
+                <div class="mb-3 flex items-center justify-between gap-2">
+                    <button @click="page = 'dashboard'" class="glass-card rounded-xl p-2 flex items-center gap-2 text-slate-600 hover:bg-white/40 transition-colors">
+                        <i class="ph ph-caret-left"></i>
+                        <span class="text-sm font-medium">Назад</span>
+                    </button>
+                    
+                    <button @click="loadUserData" class="glass-card rounded-xl p-2 flex items-center gap-2 text-blue-600 hover:bg-white/40 transition-colors">
+                        <i class="ph ph-arrow-clockwise text-lg"></i>
+                        <span class="text-sm font-medium">Оновити</span>
+                    </button>
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 mb-3">
+                    <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <i class="ph-fill ph-chart-pie text-purple-600"></i>
+                        Фінансовий статус
+                    </h3>
+                    
+                    <div class="space-y-2">
+                        <div class="bg-white/50 rounded-xl p-3">
+                            <p class="text-xs text-slate-500 mb-1">ОСББ</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-slate-600">Переплата:</span>
+                                <span class="text-sm font-bold" 
+                                      :class="user.osbbOverpayment === '—' ? 'text-slate-600' : 'text-slate-400'"
+                                      x-text="user.osbbOverpayment === '—' ? '—' : user.osbbOverpayment + ' грн'"></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-slate-600">Борг:</span>
+                                <span class="text-sm font-bold" 
+                                      :class="user.osbbDebt === '—' ? 'text-slate-600' : 'text-red-600'"
+                                      x-text="user.osbbDebt === '—' ? '—' : user.osbbDebt + ' грн'"></span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/50 rounded-xl p-3">
+                            <p class="text-xs text-slate-500 mb-1">Вода</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-slate-600">Переплата:</span>
+                                <span class="text-sm font-bold" 
+                                      :class="user.waterOverpayment === '—' ? 'text-slate-600' : 'text-slate-400'"
+                                      x-text="user.waterOverpayment === '—' ? '—' : user.waterOverpayment + ' грн'"></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-slate-600">Борг:</span>
+                                <span class="text-sm font-bold" 
+                                      :class="user.waterDebt === '—' ? 'text-slate-600' : 'text-red-600'"
+                                      x-text="user.waterDebt === '—' ? '—' : user.waterDebt + ' грн'"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <div class="glass-card rounded-2xl p-4 mb-3">
+                    <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <i class="ph-fill ph-wallet text-green-600"></i>
+                        Бюджет та реквізити
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <div class="bg-white/50 rounded-xl p-3">
+                            <p class="text-xs text-slate-500 mb-1">💵 Бюджет будинку складає:</p>
+                            <p class="text-lg font-bold text-green-600">52,483 грн</p>
+                        </div>
+
+                        <div class="bg-white/50 rounded-xl p-3">
+                            <p class="text-xs text-slate-500 mb-2">Реквізити для сплати:</p>
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between bg-white rounded-lg p-2">
+                                    <span class="text-sm font-mono font-bold text-slate-800">4441 1110 5218 2718</span>
+                                    <button onclick="navigator.clipboard.writeText('4441111052182718')" class="text-blue-600 hover:text-blue-700">
+                                        <i class="ph ph-copy text-lg"></i>
+                                    </button>
+                                </div>
+                                <div class="text-center text-xs text-slate-500">або</div>
+                                <a href="https://send.monobank.ua/3PopUQvnkm" target="_blank" class="block bg-black text-white rounded-lg p-2 text-center text-sm font-semibold hover:bg-gray-800 transition-colors">
+                                    💳 Monobank
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 mb-3">
+                    <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <i class="ph-fill ph-clock text-orange-600"></i>
+                        Остання активність
+                    </h3>
+                    
+                    <div class="space-y-2 bg-white/50 rounded-xl p-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-600">Вартість останньої різниці:</span>
+                            <span class="text-sm font-bold text-slate-800" x-text="user.lastDifferenceCost === '—' ? '—' : user.lastDifferenceCost + ' грн'"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-600">Попередній показник:</span>
+                            <span class="text-sm font-bold text-slate-800" x-text="user.lastCounter"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-600">Остання сплата:</span>
+                            <span class="text-sm font-bold text-slate-800" x-text="user.lastPaymentDate"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <button @click="sendMessageToAdmin" class="glass-card rounded-2xl p-3 flex items-center justify-center gap-2 text-blue-600 hover:bg-white/40 transition-colors font-semibold mb-3">
+                    <i class="ph-fill ph-chat-text text-xl"></i>
+                    <span>Відправити повідомлення</span>
+                </button>
+
             </div>
+
         </div>
+    </main>
 
-   </main>
-
-    <!-- Футер з кнопкою "Вихід" (показується на всіх екранах крім login) -->
     <footer x-show="page !== 'login'" class="w-full max-w-sm mt-4 pb-4" style="display: none;">
         <button @click="logout" class="w-full glass-card rounded-2xl p-3 flex items-center justify-center gap-2 text-red-600 hover:bg-red-50 transition-colors font-semibold">
             <i class="ph-fill ph-sign-out text-xl"></i>
@@ -288,27 +262,23 @@
     <script>
         function osbbApp() {
             return {
-                // ========== КОНФІГУРАЦІЯ ==========
-                GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSxpyPHuJBClfGeCD4AbBrDG9ZBEIuvFBod_IQWjwccgwvLe8-GOn4G-fEXRa_R7uz/exec', // ЗАМІНІТЬ НА СВІЙ URL
+                GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSxpyPHuJBClfGeCD4AbBrDG9ZBEIuvFBod_IQWjwccgwvLe8-GOn4G-fEXRa_R7uz/exec',
 
-                // ========== СТАН ==========
                 page: 'login',
                 loading: false,
                 errorMsg: '',
                 
-                // ========== ДАНІ КОРИСТУВАЧА ==========
                 user: {
                     flat: null,
-                    waterOverpayment: '0.00',
-                    waterDebt: '0.00',
-                    osbbOverpayment: '0.00',
-                    osbbDebt: '0.00',
+                    waterOverpayment: '—',
+                    waterDebt: '—',
+                    osbbOverpayment: '—',
+                    osbbDebt: '—',
                     lastCounter: '—',
                     lastPaymentDate: '—',
                     lastDifferenceCost: '—'
                 },
 
-                // ========== ПОЛЯ ВВОДУ ==========
                 input: {
                     flat: '',
                     password: '',
@@ -317,34 +287,28 @@
                     waterAmount: ''
                 },
 
-                // ========== TELEGRAM WEB APP ==========
                 tg: window.Telegram?.WebApp || null,
                 telegramId: null,
 
-                // ========== ІНІЦІАЛІЗАЦІЯ ==========
                 init() {
                     if (this.tg) {
                         this.tg.ready();
                         this.tg.expand();
                         
-                        // Отримуємо Telegram ID користувача
                         if (this.tg.initDataUnsafe?.user?.id) {
                             this.telegramId = this.tg.initDataUnsafe.user.id;
                         }
                     }
 
-                    // Перевіряємо чи є збережені дані авторизації
                     this.checkSavedAuth();
 
-                    // Автоматичне оновлення статистики кожні 30 секунд (якщо на сторінці статистики)
                     setInterval(() => {
                         if (this.page === 'stats' && this.user.flat) {
                             this.loadUserData();
                         }
-                    }, 30000); // 30 секунд
+                    }, 30000);
                 },
 
-                // ========== ПЕРЕВІРКА ЗБЕРЕЖЕНОЇ АВТОРИЗАЦІЇ ==========
                 checkSavedAuth() {
                     try {
                         const savedFlat = localStorage.getItem('osbb_flat');
@@ -361,74 +325,63 @@
                     }
                 },
 
-                // ========== АВТОРИЗАЦІЯ ==========
                 async login() {
-    if (!this.input.flat || !this.input.password) {
-        this.errorMsg = 'Заповніть всі поля';
-        this.page = 'login'; // Показуємо екран логіну
-        return;
-    }
+                    if (!this.input.flat || !this.input.password) {
+                        this.errorMsg = 'Заповніть всі поля';
+                        this.page = 'login';
+                        return;
+                    }
 
-    this.loading = true;
-    this.errorMsg = '';
+                    this.loading = true;
+                    this.errorMsg = '';
 
-    try {
-        const params = new URLSearchParams({
-            action: 'auth',
-            flat: this.input.flat,
-            password: this.input.password,
-            telegram_id: this.telegramId || ''
-        });
+                    try {
+                        const params = new URLSearchParams({
+                            action: 'auth',
+                            flat: this.input.flat,
+                            password: this.input.password,
+                            telegram_id: this.telegramId || ''
+                        });
 
-        const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?${params}`);
-        const data = await response.json();
+                        const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?${params}`);
+                        const data = await response.json();
 
-        if (data.success) {
-            this.user.flat = data.flat;
-            
-            // Зберігаємо дані авторизації в localStorage
-            try {
-                localStorage.setItem('osbb_flat', this.input.flat);
-                localStorage.setItem('osbb_password', this.input.password);
-            } catch (e) {
-                console.error('Error saving to localStorage:', e);
-            }
-            
-            this.page = 'dashboard';
-            await this.loadUserData();
-        } else {
-            this.errorMsg = data.error || 'Помилка авторизації';
-            this.page = 'login'; // Показуємо екран логіну при помилці
-            
-            // Очищаємо збережені дані при помилці
-            try {
-                localStorage.removeItem('osbb_flat');
-                localStorage.removeItem('osbb_password');
-            } catch (e) {
-                console.error('Error clearing localStorage:', e);
-            }
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        this.errorMsg = 'Помилка з\'єднання';
-        this.page = 'login'; // Показуємо екран логіну при помилці
-        
-        // Очищаємо збережені дані при помилці
-        try {
-            localStorage.removeItem('osbb_flat');
-            localStorage.removeItem('osbb_password');
-        } catch (e) {
-            console.error('Error clearing localStorage:', e);
-        }
-    } finally {
-        this.loading = false;
-    }
-}
-               // ========== ЗАВАНТАЖЕННЯ ДАНИХ КОРИСТУВАЧА ==========
+                        if (data.success) {
+                            this.user.flat = data.flat;
+                            
+                            try {
+                                localStorage.setItem('osbb_flat', this.input.flat);
+                                localStorage.setItem('osbb_password', this.input.password);
+                            } catch (e) {
+                                console.error('Error saving to localStorage:', e);
+                            }
+                            
+                            this.page = 'dashboard';
+                            await this.loadUserData();
+                        } else {
+                            this.errorMsg = data.error || 'Помилка авторизації';
+                            this.page = 'login';
+                            
+                            try {
+                                localStorage.removeItem('osbb_flat');
+                                localStorage.removeItem('osbb_password');
+                            } catch (e) {
+                                console.error('Error clearing localStorage:', e);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Login error:', error);
+                        this.errorMsg = 'Помилка з\'єднання';
+                        this.page = 'login';
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
                 async loadUserData() {
                     if (!this.user.flat) return;
                     
-                    this.loading = true; // Показуємо індикатор завантаження
+                    this.loading = true;
 
                     try {
                         const params = new URLSearchParams({
@@ -440,23 +393,18 @@
                         const data = await response.json();
 
                         if (data.success) {
-                            this.user = { ...this.user, ...data.data };
+                            Object.assign(this.user, data.data);
                         }
                     } catch (error) {
                         console.error('Load user data error:', error);
-                    }
-                        } catch (error) {
-                          console.error('Load user data error:', error);
-                        } finally {
-                          this.loading = false; // Ховаємо індикатор завантаження
-                        }
+                    } finally {
+                        this.loading = false;
                     }
                 },
 
-                // ========== ПОДАННЯ ПОКАЗНИКА ЛІЧИЛЬНИКА ==========
                 async submitCounter() {
                     if (!this.input.counter || parseFloat(this.input.counter) <= 0) {
-                        this.showNotification('Введіть коректний показник', 'error');
+                        this.showNotification('Введіть коректний показник');
                         return;
                     }
 
@@ -473,25 +421,23 @@
                         const data = await response.json();
 
                         if (data.success) {
-                            this.showNotification('Показник успішно додано! ✅', 'success');
+                            this.showNotification('Показник успішно додано! ✅');
                             this.input.counter = '';
-                            // Оновлюємо дані користувача (включно з останнім показником)
                             await this.loadUserData();
                         } else {
-                            this.showNotification(data.error || 'Помилка', 'error');
+                            this.showNotification(data.error || 'Помилка');
                         }
                     } catch (error) {
                         console.error('Submit counter error:', error);
-                        this.showNotification('Помилка з\'єднання', 'error');
+                        this.showNotification('Помилка з\'єднання');
                     } finally {
                         this.loading = false;
                     }
                 },
 
-                // ========== ПОДАННЯ СПЛАТИ ОСББ ==========
                 async submitOsbbPayment() {
                     if (!this.input.osbbAmount || parseFloat(this.input.osbbAmount) <= 0) {
-                        this.showNotification('Введіть коректну суму', 'error');
+                        this.showNotification('Введіть коректну суму');
                         return;
                     }
 
@@ -509,24 +455,23 @@
                         const data = await response.json();
 
                         if (data.success) {
-                            this.showNotification('Платіж за ОСББ зафіксовано. Після перевірки буде внесено до вашого рахунку.', 'success');
+                            this.showNotification('Платіж за ОСББ зафіксовано. Після перевірки буде внесено до вашого рахунку.');
                             this.input.osbbAmount = '';
                             await this.loadUserData();
                         } else {
-                            this.showNotification(data.error || 'Помилка', 'error');
+                            this.showNotification(data.error || 'Помилка');
                         }
                     } catch (error) {
                         console.error('Submit OSBB payment error:', error);
-                        this.showNotification('Помилка з\'єднання', 'error');
+                        this.showNotification('Помилка з\'єднання');
                     } finally {
                         this.loading = false;
                     }
                 },
 
-                // ========== ПОДАННЯ СПЛАТИ ВОДИ ==========
                 async submitWaterPayment() {
                     if (!this.input.waterAmount || parseFloat(this.input.waterAmount) <= 0) {
-                        this.showNotification('Введіть коректну суму', 'error');
+                        this.showNotification('Введіть коректну суму');
                         return;
                     }
 
@@ -544,50 +489,50 @@
                         const data = await response.json();
 
                         if (data.success) {
-                            this.showNotification('Платіж за воду зафіксовано. Після перевірки буде внесено до вашого рахунку.', 'success');
+                            this.showNotification('Платіж за воду зафіксовано. Після перевірки буде внесено до вашого рахунку.');
                             this.input.waterAmount = '';
                             await this.loadUserData();
                         } else {
-                            this.showNotification(data.error || 'Помилка', 'error');
+                            this.showNotification(data.error || 'Помилка');
                         }
                     } catch (error) {
                         console.error('Submit water payment error:', error);
-                        this.showNotification('Помилка з\'єднання', 'error');
+                        this.showNotification('Помилка з\'єднання');
                     } finally {
                         this.loading = false;
                     }
                 },
-// ========== ВІДПРАВКА ПОВІДОМЛЕННЯ АДМІНІСТРАТОРУ ==========
-async sendMessageToAdmin() {
-    const message = prompt("Введіть ваше повідомлення для адміністратора:");
-    if (!message || message.trim() === '') return;
-    
-    this.loading = true;
-    
-    try {
-        const params = new URLSearchParams({
-            action: 'sendAdminMessage',
-            flat: this.user.flat,
-            message: message
-        });
 
-        const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?${params}`);
-        const data = await response.json();
+                async sendMessageToAdmin() {
+                    const message = prompt("Введіть ваше повідомлення для адміністратора:");
+                    if (!message || message.trim() === '') return;
+                    
+                    this.loading = true;
+                    
+                    try {
+                        const params = new URLSearchParams({
+                            action: 'sendAdminMessage',
+                            flat: this.user.flat,
+                            message: message
+                        });
 
-        if (data.success) {
-            this.showNotification('Повідомлення надіслано адміністратору! ✅', 'success');
-        } else {
-            this.showNotification(data.error || 'Помилка', 'error');
-        }
-    } catch (error) {
-        console.error('Send admin message error:', error);
-        this.showNotification('Помилка з\'єднання', 'error');
-    } finally {
-        this.loading = false;
-    }
-},
-                // ========== ПОКАЗ СПОВІЩЕННЯ ==========
-                showNotification(message, type = 'info') {
+                        const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?${params}`);
+                        const data = await response.json();
+
+                        if (data.success) {
+                            this.showNotification('Повідомлення надіслано адміністратору! ✅');
+                        } else {
+                            this.showNotification(data.error || 'Помилка');
+                        }
+                    } catch (error) {
+                        console.error('Send admin message error:', error);
+                        this.showNotification('Помилка з\'єднання');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                showNotification(message) {
                     if (this.tg) {
                         this.tg.showAlert(message);
                     } else {
@@ -595,9 +540,7 @@ async sendMessageToAdmin() {
                     }
                 },
 
-                // ========== ВИХІД ==========
                 logout() {
-                    // Очищаємо localStorage
                     try {
                         localStorage.removeItem('osbb_flat');
                         localStorage.removeItem('osbb_password');
@@ -628,6 +571,5 @@ async sendMessageToAdmin() {
             }
         }
     </script>
-
 </body>
 </html>
